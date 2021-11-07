@@ -28,13 +28,11 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
 
   if (!is.null(Z)) {
 
-
     Z<-as.matrix(Z)
 
     if (dim(Y)[1]!= n || dim(Z)[1]!=n) {
       return(warning('X, Y ,Z must be of same length'))
     }
-
 
     if (method=='cdf') {
 
@@ -42,10 +40,8 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
 
       drf.forest.Y.Z <- drf(X=cbind(Y,Z), X)
 
-
       w.Z.Y<-get_sample_weights(drf.forest.Y.Z, newdata=cbind(Y,Z))
       w.Z<-get_sample_weights(drf.forest.Z, newdata = Z)
-
 
       if (is.null(speedupmatrix)) {
         speedupmatrix<-matrix(0,n,n)
@@ -55,12 +51,7 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
         }
       }
 
-
       res<-abs(rowSums(as.matrix(w.Z.Y*speedupmatrix))-rowSums(as.matrix(w.Z*speedupmatrix)))
-
-
-
-
 
     }else if (method=='pdf') {
       drf.forest.Z <- drf(Z, X)
@@ -70,6 +61,10 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
       w.Z.Y<-get_sample_weights(drf.forest.Y.Z, newdata=cbind(Y,Z))
       w.Z<-get_sample_weights(drf.forest.Z, newdata = Z)
       res<-rowSums(as.matrix(abs(w.Z.Y-w.Z)))/n
+    }else if (method =='mmd') {
+
+    #TODO
+
     }else{
       return(warning('wrong method selected'))
     }
@@ -78,6 +73,7 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
 
   }
   else{
+
     drf.forest.Y <- drf(Y, X)
     w.Z.Y<-get_sample_weights(drf.forest.Y, newdata = Y)
     res<-vector()
