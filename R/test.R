@@ -1,4 +1,5 @@
 #testing
+
 n=400
 
 Z = matrix(runif(2 * n,-1,1), ncol = 2)
