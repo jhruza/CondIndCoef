@@ -1,6 +1,4 @@
-
-
-library(drf)
+#' @import drf
 
 multi.which<-function(X,x){
   if (ncol(X)==1) {
@@ -16,6 +14,13 @@ multi.which<-function(X,x){
   return(idx)
 }
 
+#kernel function
+ker <- function(x,y){
+  #return(exp(-(rowSums((x-y)^2))*1/2))  #gaussian kernel with sigma = 1/2
+  return(rowSums(x*y)) #linear kernel
+}
+
+
 
 # method is by default 'cdf' which is the sampi coefficient, alternatively one can choose 'pdf' which is the mean of l1 difference of the weights.
 #speedupmatrix is a parameter which can be pre-calculated when calling sampi several times with the same X to speed up the calculation such as in variable selection
@@ -27,7 +32,7 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
   n<-dim(X)[1]
 
   if (!is.null(Z)) {
-
+    #conditional case
     Z<-as.matrix(Z)
 
     if (dim(Y)[1]!= n || dim(Z)[1]!=n) {
@@ -36,12 +41,12 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
 
     if (method=='cdf') {
 
-      drf.forest.Z <- drf(Z, X)
+      drf.forest.Z <- drf::drf(Z, X)
 
-      drf.forest.Y.Z <- drf(X=cbind(Y,Z), X)
+      drf.forest.Y.Z <- drf::drf(X=cbind(Y,Z), X)
 
-      w.Z.Y<-get_sample_weights(drf.forest.Y.Z, newdata=cbind(Y,Z))
-      w.Z<-get_sample_weights(drf.forest.Z, newdata = Z)
+      w.Z.Y<-drf::get_sample_weights(drf.forest.Y.Z, newdata=cbind(Y,Z))
+      w.Z<-drf::get_sample_weights(drf.forest.Z, newdata = Z)
 
       if (is.null(speedupmatrix)) {
         speedupmatrix<-matrix(0,n,n)
@@ -54,12 +59,12 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
       res<-abs(rowSums(as.matrix(w.Z.Y*speedupmatrix))-rowSums(as.matrix(w.Z*speedupmatrix)))
 
     }else if (method=='pdf') {
-      drf.forest.Z <- drf(Z, X)
+      drf.forest.Z <- drf::drf(Z, X)
 
-      drf.forest.Y.Z <- drf(X=cbind(Y,Z), X)
+      drf.forest.Y.Z <- drf::drf(X=cbind(Y,Z), X)
 
-      w.Z.Y<-get_sample_weights(drf.forest.Y.Z, newdata=cbind(Y,Z))
-      w.Z<-get_sample_weights(drf.forest.Z, newdata = Z)
+      w.Z.Y<-drf::get_sample_weights(drf.forest.Y.Z, newdata=cbind(Y,Z))
+      w.Z<-drf::get_sample_weights(drf.forest.Z, newdata = Z)
       res<-rowSums(as.matrix(abs(w.Z.Y-w.Z)))/n
     }else if (method =='mmd') {
 
@@ -73,17 +78,29 @@ cond.ind.coef <- function(X,Y,Z=NULL, method='cdf', speedupmatrix=NULL) {
 
   }
   else{
+    #unconditional case
 
-    drf.forest.Y <- drf(Y, X)
-    w.Z.Y<-get_sample_weights(drf.forest.Y, newdata = Y)
-    res<-vector()
-    for (j in 1:n) {
-      idx<-multi.which(X,X[j,])
-      res[length(res)+1]<-abs(length(idx)/n - sum(w.Z.Y[j,idx]))
+    #want to estimate mmd(p_x , p_{x |y}) using formula 2.1 of master thesis
+    if(method=='mmd'){
+      #TODO
+
+
+
+
+
+
+    }else{
+
+      drf.forest.Y <- drf::drf(Y, X)
+      w.Z.Y<-drf::get_sample_weights(drf.forest.Y, newdata = Y)
+      res<-vector()
+      for (j in 1:n) {
+        idx<-multi.which(X,X[j,])
+        res[length(res)+1]<-abs(length(idx)/n - sum(w.Z.Y[j,idx]))
+      }
+
+      res<-mean(res)
     }
-
-    res<-mean(res)
-
   }
 
 
