@@ -113,7 +113,8 @@ cond.ind.coef <-
 
 
       } else{
-
+      #cdf difference
+        res<-vector()
         for (j in 1:n) {
           idx <- multi.which(X, X[j, ])
           res[length(res) + 1] <- abs(length(idx) / n - sum(w.Y[j, idx]))
