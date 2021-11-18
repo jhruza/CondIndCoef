@@ -99,12 +99,16 @@ cond.ind.coef <-
       #want to estimate mmd(p_x , p_{x |y}) using formula 2.1 of master thesis
       if (method == 'mmd') {
 
-        # nxn matrix with entries K(x_i,k_j)
-        kernelmatrix<-ker(matrix(X[j,], nrow=length(idx), ncol=length(X[j,]), byrow=TRUE),X[idx])
+        # nxn matrix with entries K(x_i,x_j)
+        kernelmatrix<-matrix(0, nrow = n, ncol = n)
+        for (i in 1:n) {
+            kernelmatrix[i,]<-ker(matrix(rep(X[i,],n),nrow = n, byrow=TRUE),X)
+
+        }
 
         res <- vector()
         for (i in 1:n){
-          res[lenght(res)+1]<- 1/n^2*sum(kernelmatrix)+sum( (w.Z[i,]%*%t(w.Z[i,]) *kernelmatrix) -2/n*sum( as.vector(w.Z[i,])*kernelmatrix ))
+          res[length(res)+1]<- 1/n^2*sum(kernelmatrix)+sum( (w.Y[i,]%*%t(w.Y[i,]) *kernelmatrix) -2/n*sum( as.vector(w.Y[i,])*kernelmatrix ))
         }
 
 
