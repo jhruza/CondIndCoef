@@ -80,7 +80,20 @@ cond.ind.coef <-
         res <- rowSums(as.matrix(abs(w.Z.Y - w.Z))) / n
 
       } else if (method == 'mmd') {
-        #TODO
+
+
+        # nxn matrix with entries K(x_i,x_j)
+        kernelmatrix<-matrix(0, nrow = n, ncol = n)
+        for (i in 1:n) {
+          kernelmatrix[i,]<-ker(matrix(rep(X[i,],n),nrow = n, byrow=TRUE),X)
+        }
+
+        res <- vector()
+        for (i in 1:n){
+          res[length(res)+1]<- sum( (w.Z[i,]%*%t(w.Z[i,])) *kernelmatrix)+sum( (w.Z.Y[i,]%*%t(w.Z.Y[i,])) *kernelmatrix )-2*sum( (w.Z.Y[i,]%*%t(w.Z[i,])) *kernelmatrix )
+        }
+
+
 
       } else{
         return(warning('wrong method selected'))
@@ -103,12 +116,11 @@ cond.ind.coef <-
         kernelmatrix<-matrix(0, nrow = n, ncol = n)
         for (i in 1:n) {
             kernelmatrix[i,]<-ker(matrix(rep(X[i,],n),nrow = n, byrow=TRUE),X)
-
         }
 
         res <- vector()
         for (i in 1:n){
-          res[length(res)+1]<- 1/n^2*sum(kernelmatrix)+sum( (w.Y[i,]%*%t(w.Y[i,]) *kernelmatrix) )-2/n*sum( as.vector(w.Y[i,])*kernelmatrix )
+          res[length(res)+1]<- 1/n^2*sum(kernelmatrix)+sum( (w.Y[i,]%*%t(w.Y[i,])) *kernelmatrix )-2/n*sum( as.vector(w.Y[i,])*kernelmatrix )
         }
 
 
