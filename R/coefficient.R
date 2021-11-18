@@ -108,7 +108,7 @@ cond.ind.coef <-
 
         res <- vector()
         for (i in 1:n){
-          res[length(res)+1]<- 1/n^2*sum(kernelmatrix)+sum( (w.Y[i,]%*%t(w.Y[i,]) *kernelmatrix) -2/n*sum( as.vector(w.Y[i,])*kernelmatrix ))
+          res[length(res)+1]<- 1/n^2*sum(kernelmatrix)+sum( (w.Y[i,]%*%t(w.Y[i,]) *kernelmatrix) )-2/n*sum( as.vector(w.Y[i,])*kernelmatrix )
         }
 
 
